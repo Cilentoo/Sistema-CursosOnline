@@ -1,4 +1,5 @@
-﻿namespace Sistema_CursosOnline.Domain.Entities
+﻿
+namespace Sistema_CursosOnline.Domain.Entities
 {
     public class Course
     {
@@ -22,14 +23,5 @@
         }
 
         public Course() {}
-
-        public bool ValidarCurso()
-        {
-            if (string.IsNullOrEmpty(Titulo) || Titulo.Length < 3)
-            {
-                return false;
-            }
-            return true;
-        }
     }
 }
