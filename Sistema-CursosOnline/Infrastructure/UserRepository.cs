@@ -17,7 +17,7 @@ namespace Sistema_CursosOnline.Infrastructure
             _dbConnection = dbConnection;
         }
 
-        public async Task<IEnumerable<User>> GetUsersAsync()
+        public async Task<IEnumerable<User>> GetUserAsync()
         {
             var query = "SELECT * FROM Users";
             using (var connection = _dbConnection.GetConnection()) 
@@ -40,13 +40,13 @@ namespace Sistema_CursosOnline.Infrastructure
             var query = "SELECT * FROM Users WHERE Email = @Email";
             using (var connection = _dbConnection.GetConnection())
             {
-                return await connection.QueryFirstOrDefaultAsync<User>(query, new { Email = email }) ?? throw new InvalidOperationException("Usuário não encontrado"); ;
+                return await connection.QueryFirstOrDefaultAsync<User>(query, new { Email = email });
             }
         }
 
         public async Task AddAsync(User user)
         {
-            var query = "INSERT INTO Users (Name, Email, PasswordHash, Role) VALUES (@Name, @Email, @PasswordHash, @Role)";
+            var query = "INSERT INTO Users (Name, Email, PasswordHash, Role, Status) VALUES (@Name, @Email, @PasswordHash, @Role, @Status)";
             using (var connection = _dbConnection.GetConnection())
             {
                 await connection.ExecuteAsync(query, user);
@@ -55,7 +55,7 @@ namespace Sistema_CursosOnline.Infrastructure
 
         public async Task UpdateAsync (User user)
         {
-            var query = "UPDATE Users SET Name = @Name, Email = @Email, PasswordHash = @PasswordHash, Role = @Role WHERE Id = @Id";
+            var query = "UPDATE Users SET Name = @Name, Email = @Email, PasswordHash = @PasswordHash, Role = @Role, Status = @Status WHERE Id = @Id";
             using (var connection = _dbConnection.GetConnection())
             {
                 await connection.ExecuteAsync(query, user);
@@ -67,8 +67,8 @@ namespace Sistema_CursosOnline.Infrastructure
             var query = "UPDATE Users SET Status = 'Inativo' WHERE id = @Id";
             using (var connection = _dbConnection.GetConnection())
             {
-                await connection.ExecuteAsync(query, new { Id = id });
-            }
+                await connection.ExecuteAsync(query, new { Id = id, });
+                 }
         }
 
         public async Task<User> AuthenticateAsync(string email, string password)
