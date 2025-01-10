@@ -14,10 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\DTO\" />
     <Folder Include="Application\ServicesApp\" />
     <Folder Include="Presentation\Controllers\" />
-    <Folder Include="Domain\Services\" />
+    <Folder Include="Domain\IServices\" />
     <Folder Include="Presentation\" />
   </ItemGroup>
 
