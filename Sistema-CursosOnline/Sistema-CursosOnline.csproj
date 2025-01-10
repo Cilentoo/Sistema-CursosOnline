@@ -14,9 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\ServicesApp\" />
     <Folder Include="Presentation\Controllers\" />
-    <Folder Include="Domain\IServices\" />
     <Folder Include="Presentation\" />
   </ItemGroup>
 
