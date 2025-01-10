@@ -7,6 +7,7 @@
         public string Description { get; set; }
         public Course CourseId { get; set; }
 
+
         public Module(int id, string name, string description, Course courseId)
         {
             Id = id;

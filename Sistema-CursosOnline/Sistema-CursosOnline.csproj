@@ -8,16 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="Npgsql" Version="9.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Application\DTO\" />
-    <Folder Include="Application\Services\" />
+    <Folder Include="Application\ServicesApp\" />
     <Folder Include="Presentation\Controllers\" />
-    <Folder Include="Domain\IRepository\" />
     <Folder Include="Domain\Services\" />
-    <Folder Include="Infrastructure\" />
     <Folder Include="Presentation\" />
   </ItemGroup>
 

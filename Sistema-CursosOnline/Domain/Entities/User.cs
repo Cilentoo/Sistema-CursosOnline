@@ -3,20 +3,27 @@
     public class User
     {
         public int Id { get; set; }
+
         public string Name { get; set; }
+
         public string Email { get; set; }
-        public string Password { get; set; }
+
+        public string PasswordHash { get; set; }
+
         public EType Role { get; set; }
+
+        public string Status { get; set; }
 
         public User() { }
 
-        public User(int id, string name, string email, string password, EType role)
+        public User(int id, string name, string email, string passwordHash, EType role , String status)
         {
             Id = id;
-            this.Name = name;
-            this.Email = email;
-            this.Password = password;
-            this.Role = role;
+            Name = name;
+            Email = email;
+            PasswordHash = passwordHash;
+            Role = role;
+            Status = status;
         }
     }
 
