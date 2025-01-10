@@ -10,7 +10,9 @@ namespace Sistema_CursosOnline.Domain.IRepository
 
         Task<IEnumerable<Course>> GetByStatusAsync(string status);
 
-        Task AddOrUpdateAsync(Course course);
+        Task AddAsync(Course course);
+
+        Task UpdateAsync(Course course);
         
         Task InactiveCourseAsync(int id);
     }
