@@ -5,7 +5,7 @@ using Sistema_CursosOnline.Application.ServicesApp;
 
 namespace Sistema_CursosOnline.Presentation.Controllers
 {
-    [Route("api/enrollments")]
+    [Route("api/[controller]")]
     [ApiController]
     public class EnrollmentController : ControllerBase
     {
@@ -18,7 +18,7 @@ namespace Sistema_CursosOnline.Presentation.Controllers
         }
 
         [HttpGet("{courseId}")]
-        [Authorize(Roles = "Student")]
+       // [Authorize(Roles = "Student")]
         public async Task<IActionResult> GetEnrollmentStatus(int courseId)
         {
             var studentId = GetStudentId(); 
@@ -27,7 +27,7 @@ namespace Sistema_CursosOnline.Presentation.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Student")]
+       // [Authorize(Roles = "Student")]
         public async Task<IActionResult> EnrollInCourse([FromBody] EnrollmentDTO enrollmentDTO)
         {
             var studentId = GetStudentId(); 
@@ -37,7 +37,7 @@ namespace Sistema_CursosOnline.Presentation.Controllers
 
 
         [HttpDelete("{courseId}")]
-        [Authorize(Roles = "Student")]
+       // [Authorize(Roles = "Student")]
         public async Task<IActionResult> UnenrollFromCourse(int courseId)
         {
             var studentId = GetStudentId();

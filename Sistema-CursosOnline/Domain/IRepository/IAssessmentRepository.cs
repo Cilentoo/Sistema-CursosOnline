@@ -14,6 +14,5 @@ namespace Sistema_CursosOnline.Domain.IRepository
 
         Task DeleteAsync (int courseId);
 
-        Task<double?> GetAverageNotesByCourseId(int courseId);
     }
 }
