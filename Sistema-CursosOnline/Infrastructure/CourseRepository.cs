@@ -10,7 +10,7 @@ namespace Sistema_CursosOnline.Infrastructure
     {
         private readonly PostgresConnection _dbConnection;
 
-        public CourseRepository (PostgresConnection dbConnection)
+        public CourseRepository(PostgresConnection dbConnection)
         {
             _dbConnection = dbConnection;
         }
@@ -18,7 +18,7 @@ namespace Sistema_CursosOnline.Infrastructure
         public async Task<IEnumerable<Course>> GetAllAsync()
         {
             var query = "SELECT * FROM Courses";
-            using (var connection = _dbConnection.GetConnection()) 
+            using(var connection = _dbConnection.GetConnection()) 
             {
                 return await connection.QueryAsync<Course>(query);
             }
@@ -45,7 +45,7 @@ namespace Sistema_CursosOnline.Infrastructure
 
         public async Task AddAsync(Course course)
         { 
-            var query = "INSERT INTO Courses (Title, Description, InstructorId, Status, CreationDate) VALUES (@Title, @Description, @InstructorId, @CreationDate)";
+            var query = "INSERT INTO Courses (Title, Description, InstructorId, Status, CreationDate, PhotoURL) VALUES (@Title, @Description, @InstructorId, @CreationDate, @PhotoURL)";
             using (var connection = _dbConnection.GetConnection())
             {
                 await connection.ExecuteAsync(query, course);
@@ -54,7 +54,7 @@ namespace Sistema_CursosOnline.Infrastructure
 
         public async Task UpdateAsync(Course course)
         {
-            var query = "UPDATE Courses SET Title = @Title, Description = @Description, InstructorId = @InstructorId, Status = @Status WHERE Id = @Id";
+            var query = "UPDATE Courses SET Title = @Title, Description = @Description, InstructorId = @InstructorId, Status = @Status, PhotoURL = @PhotoURL WHERE Id = @Id";
             using (var connection = _dbConnection.GetConnection())
             {
                 await connection.ExecuteAsync(query, course);
