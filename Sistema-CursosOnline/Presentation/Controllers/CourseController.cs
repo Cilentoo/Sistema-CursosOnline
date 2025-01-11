@@ -6,7 +6,7 @@ using Sistema_CursosOnline.Application.ServicesApp;
 
 namespace Sistema_CursosOnline.Presentation.Controllers
 {
-    [Route("api/courses")]
+    [Route("api/[controller]")]
     [ApiController]
     public class CourseController : ControllerBase
     {
@@ -34,7 +34,7 @@ namespace Sistema_CursosOnline.Presentation.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Instructor")]
+        //[Authorize(Roles = "Instructor")]
         public async Task<IActionResult> AddCourse([FromBody] CourseDTO courseDTO)
         {
             await _courseService.AddAsync(courseDTO);
@@ -42,7 +42,7 @@ namespace Sistema_CursosOnline.Presentation.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Instructor")]
+       // [Authorize(Roles = "Instructor")]
         public async Task<IActionResult> UpdateCourse(int id, [FromBody] CourseDTO courseDTO )
         {
             if (id != courseDTO.Id)
@@ -53,7 +53,7 @@ namespace Sistema_CursosOnline.Presentation.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Instructor")]
+        //[Authorize(Roles = "Instructor")]
         public async Task<IActionResult> DeleteCourse(int id)
         {
             await _courseService.InactiveCourseAsync(id);

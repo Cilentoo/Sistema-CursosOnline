@@ -60,14 +60,5 @@ namespace Sistema_CursosOnline.Infrastructure
                 await connection.ExecuteAsync(query, new { Id = id });
             }
         }
-
-        public async Task<double?> GetAverageNotesByCourseId(int courseId)
-        {
-            var query = "SELECT AVG(notes) FROM Assessments WHERE courseId = @CourseId";
-            using (var connection = _dbConnection.GetConnection())
-            {
-                return await connection.QueryFirstOrDefaultAsync<double?>(query, courseId);
-            }
-        }
     }
 }
