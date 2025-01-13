@@ -26,9 +26,8 @@ namespace Sistema_CursosOnline.Application.ServicesApp
                 Id = course.Id,
                 Title = course.Title,
                 Description = course.Description,
-                CoverImage = course.CoverImage,
+                CoverImage = course.CoverImage != null ? Convert.ToBase64String(course.CoverImage) : null,
                 CreatedAt = course.CreatedAt,
-                InstructorName = course.Instructor.Name,
                 InstructorId = course.Instructor.Id  
             };
         }
@@ -42,9 +41,8 @@ namespace Sistema_CursosOnline.Application.ServicesApp
                 Id = course.Id,
                 Title = course.Title,
                 Description = course.Description,
-                CoverImage = course.CoverImage,
+                CoverImage = course.CoverImage != null ? Convert.ToBase64String(course.CoverImage) : null,
                 CreatedAt = course.CreatedAt,
-                InstructorName = course.Instructor.Name,  
                 InstructorId = course.Instructor.Id
             });
         }
@@ -57,26 +55,43 @@ namespace Sistema_CursosOnline.Application.ServicesApp
                 Id = course.Id,
                 Title = course.Title,
                 Description = course.Description,
-                CoverImage = course.CoverImage,
+                CoverImage = course.CoverImage != null ? Convert.ToBase64String(course.CoverImage) : null,
                 CreatedAt = course.CreatedAt,
-                InstructorName = course.Instructor.Name,
                 InstructorId = course.Instructor.Id
             });
         }
 
         public async Task AddCourseAsync(CourseDTO courseDto)
         {
-            
+
             var instructor = await _userRepository.GetByIdAsync(courseDto.InstructorId);
             if (instructor == null) throw new Exception("Instructor not found");
+
+
+            byte[] coverImageBytes = null;
+
+            if (!string.IsNullOrEmpty(courseDto.CoverImage))
+            {
+              
+                if (courseDto.CoverImage.Contains(","))
+                {
+                    coverImageBytes = Convert.FromBase64String(courseDto.CoverImage.Split(',')[1]);
+                }
+                else
+                {
+                    coverImageBytes = Convert.FromBase64String(courseDto.CoverImage);  
+                }
+            }
+
 
             var course = new Course
             {
                 Title = courseDto.Title,
                 Description = courseDto.Description,
-                CoverImage = courseDto.CoverImage,
+                CoverImage = coverImageBytes,
                 CreatedAt = DateTime.UtcNow,
-                Instructor = instructor
+                InstructorId = courseDto.InstructorId,
+                Instructor = instructor,
             };
 
             await _courseRepository.AddAsync(course);
@@ -88,13 +103,20 @@ namespace Sistema_CursosOnline.Application.ServicesApp
             var instructor = await _userRepository.GetByIdAsync(courseDto.InstructorId);
             if (instructor == null) throw new Exception("Instructor not found");
 
-          
+            byte[] coverImageBytes = null;
+
+            if (!string.IsNullOrEmpty(courseDto.CoverImage)) 
+            {
+                coverImageBytes = Convert.FromBase64String(courseDto.CoverImage);  
+            }
+
+
             var course = new Course
             {
                 Id = courseDto.Id,
                 Title = courseDto.Title,
                 Description = courseDto.Description,
-                CoverImage = courseDto.CoverImage,
+                CoverImage = coverImageBytes,
                 CreatedAt = courseDto.CreatedAt,
                 Instructor = instructor
             };

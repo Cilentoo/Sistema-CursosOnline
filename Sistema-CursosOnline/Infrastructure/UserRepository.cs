@@ -38,7 +38,7 @@ namespace Sistema_CursosOnline.Infrastructure
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            var query = "SELECT Name, Email, Password_Hash AS PasswordHash, Role, Status FROM users WHERE Email = @Email";
+            var query = "SELECT Id, Name, Email, Password_Hash AS PasswordHash, Role, Status FROM users WHERE Email = @Email";
             using (var connection = _dbConnection.GetConnection())
             {
                 var user = await connection.QueryFirstOrDefaultAsync<User>(query, new { Email = email });
@@ -49,10 +49,13 @@ namespace Sistema_CursosOnline.Infrastructure
         public async Task AddAsync(User user, string password)
         {
             user.SetPassword(password);
-            var query = "INSERT INTO users (Name, Email, Password_Hash, Role, Status) VALUES (@Name, @Email, @PasswordHash, @Role, 'Ativo')";
+            var query = @"
+                INSERT INTO users (Name, Email, Password_Hash, Role, Status) 
+                VALUES (@Name, @Email, @PasswordHash, @Role, 'Ativo') 
+                RETURNING Id";
             using (var connection = _dbConnection.GetConnection())
             {
-                await connection.ExecuteAsync(query, user);
+                user.Id = await connection.QuerySingleAsync<int>(query, user);
             }
         }
 

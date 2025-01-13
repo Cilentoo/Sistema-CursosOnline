@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Sistema_CursosOnline.Application.DTO;
 using Sistema_CursosOnline.Domain.IServices;
 
@@ -42,6 +44,23 @@ namespace Sistema_CursosOnline.Presentation.Controllers
                 return BadRequest("Dados inválidos");
             }
 
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("Usuário não autenticado.");
+            }
+
+            byte[] coverImageBytes = null;
+
+            if (!string.IsNullOrEmpty(courseDto.CoverImage))
+            {
+                coverImageBytes = Convert.FromBase64String(courseDto.CoverImage);
+            }
+
+            courseDto.CoverImage = coverImageBytes != null ? Convert.ToBase64String(coverImageBytes) : null;
+
+            courseDto.InstructorId = int.Parse(userId);
+
             await _courseService.AddCourseAsync(courseDto);
             return CreatedAtAction(nameof(GetCourseById), new { id = courseDto.Id }, courseDto);
         }
@@ -60,6 +79,12 @@ namespace Sistema_CursosOnline.Presentation.Controllers
                 return NotFound();
             }
 
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId) || existingCourse.InstructorId != int.Parse(userId))
+            {
+                return Forbid("Usuário não autorizado para alterar este curso.");
+            }
+
             await _courseService.UpdateCourseAsync(courseDto);
             return NoContent();
         }
@@ -71,6 +96,12 @@ namespace Sistema_CursosOnline.Presentation.Controllers
             if (existingCourse == null)
             {
                 return NotFound();  
+            }
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId) || existingCourse.InstructorId != int.Parse(userId))
+            {
+                return Forbid("Usuário não autorizado para deletar este curso.");
             }
 
             await _courseService.DeleteCourseAsync(id);
