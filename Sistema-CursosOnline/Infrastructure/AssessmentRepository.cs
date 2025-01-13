@@ -17,7 +17,7 @@ namespace Sistema_CursosOnline.Infrastructure
 
         public async Task<IEnumerable<Assessment>> GetByCourseIdAsync(int courseId)
         {
-            var query = "SELECT * FROM Evaluations WHERE CourseId = @CourseId";
+            var query = "SELECT * FROM Assessments WHERE CourseId = @CourseId";
             using (var connection = _dbConnection.GetConnection())
             {
                 return await connection.QueryAsync<Assessment>(query, new { CourseId = courseId });
@@ -26,25 +26,17 @@ namespace Sistema_CursosOnline.Infrastructure
 
         public async Task CreateAsync(Assessment assessment)
         {
-            var query = "INSERT INTO Assessment (CourseId, StudentId, Rating, Comment) VALUES (@CourseId, @StudentId, @Rating, @Comment)";
+            var query = "INSERT INTO Assessments (CourseId, StudentId, Rating, Comment) VALUES (@CourseId, @StudentId, @Rating, @Comment)";
             using (var connection = _dbConnection.GetConnection())
             {
                 await connection.ExecuteAsync(query, assessment);
             }
         }
 
-        public async Task UpdateAsync(Assessment assessment)
-        {
-            var query = "UPDATE Evaluations SET Rating = @Rating, Comment = @Comment WHERE Id = @Id";
-            using (var connection = _dbConnection.GetConnection())
-            {
-                await connection.ExecuteAsync(query, assessment);
-            }
-        }
 
         public async Task DeleteAsync(int id)
         {
-            var query = "DELETE FROM Evaluations WHERE Id = @Id";
+            var query = "DELETE FROM Assessments WHERE Id = @Id";
             using (var connection = _dbConnection.GetConnection())
             {
                 await connection.ExecuteAsync(query, new { Id = id });

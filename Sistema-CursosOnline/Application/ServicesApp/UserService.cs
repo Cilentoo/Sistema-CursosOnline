@@ -30,6 +30,11 @@ namespace Sistema_CursosOnline.Application.ServicesApp
             {
                 throw new UnauthorizedAccessException("Email ou senha inválidos");
             }
+            if (string.IsNullOrEmpty(user.Name) || string.IsNullOrEmpty(user.Role.ToString()) || user.Id == 0)
+            {
+                throw new InvalidOperationException("Usuário com dados inválidos");
+            }
+
             return GenerateJwtToken(user);
         }
 

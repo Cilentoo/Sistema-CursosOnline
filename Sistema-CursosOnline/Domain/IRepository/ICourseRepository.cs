@@ -10,5 +10,6 @@ namespace Sistema_CursosOnline.Domain.IRepository
         Task UpdateAsync(Course course);
         Task DeleteAsync(int id);
 
+        Task<IEnumerable<Course>> GetByInstructorIdAsync(int instructorId);
     }
 }

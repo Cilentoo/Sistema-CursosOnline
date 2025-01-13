@@ -1,15 +1,17 @@
 ﻿using Sistema_CursosOnline.Application.DTO;
 using Sistema_CursosOnline.Domain.Entities;
+using Sistema_CursosOnline.Domain.IRepository;
+using Sistema_CursosOnline.Domain.IServices;
 
 namespace Sistema_CursosOnline.Application.ServicesApp
 {
-    public class AssessmentService
+    public class AssessmentService : IAssessmentService
     {
         private readonly IAssessmentRepository _assessmentRepository;
 
-        public AssessmentService(IAssessmentRepository AssessmentRepository)
+        public AssessmentService(IAssessmentRepository assessmentRepository)
         {
-            _assessmentRepository = _assessmentRepository;
+            _assessmentRepository = assessmentRepository;
         }
 
         public async Task CreateAssessmentAsync(AssessmentDTO assessmentDto)
@@ -23,18 +25,6 @@ namespace Sistema_CursosOnline.Application.ServicesApp
             };
 
             await _assessmentRepository.CreateAsync(assessment);
-        }
-
-        public async Task UpdateAssessmentAsync(int id, AssessmentDTO assessmentDto)
-        {
-            var assessment = await _assessmentRepository.GetByCourseIdAsync(id);
-            if (assessment != null)
-            {
-                assessment.Rating = assessment.Rating;
-                assessment.Comment = assessment.Comment;
-
-                await _assessmentRepository.UpdateAsync(assessment);
-            }
         }
 
         public async Task DeleteAssessmentAsync(int id)

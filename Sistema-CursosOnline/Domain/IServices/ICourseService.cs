@@ -1,4 +1,5 @@
 ﻿using Sistema_CursosOnline.Application.DTO;
+using Sistema_CursosOnline.Domain.Entities;
 
 namespace Sistema_CursosOnline.Domain.IServices
 {
@@ -9,5 +10,7 @@ namespace Sistema_CursosOnline.Domain.IServices
         Task AddCourseAsync(CourseDTO courseDto);
         Task UpdateCourseAsync(CourseDTO courseDto);
         Task DeleteCourseAsync(int id);
+
+        Task<IEnumerable<CourseDTO>> GetCoursesByInstructorIdAsync(int instructorId);
     }
 }
