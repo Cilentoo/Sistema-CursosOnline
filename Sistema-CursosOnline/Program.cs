@@ -45,6 +45,12 @@ builder.Services.AddScoped<IUserService>(provider =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+builder.Services.AddScoped<IAssessmentService, AssessmentService>();
+builder.Services.AddScoped<IAssessmentRepository, AssessmentRepository>();
+builder.Services.AddScoped<IModuleService, ModuleService>();
+builder.Services.AddScoped<IModuleRepository, ModuleRepository>();
 builder.Services.AddScoped<PostgresConnection>(provider => 
 {
     var configuration = provider.GetRequiredService<IConfiguration>(); 
