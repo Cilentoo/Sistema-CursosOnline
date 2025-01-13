@@ -30,10 +30,6 @@ namespace Sistema_CursosOnline.Application.ServicesApp
             {
                 throw new UnauthorizedAccessException("Email ou senha inválidos");
             }
-            if (string.IsNullOrEmpty(user.Name) || string.IsNullOrEmpty(user.Role.ToString()) || user.Id == 0)
-            {
-                throw new InvalidOperationException("Usuário com dados inválidos");
-            }
 
             return GenerateJwtToken(user);
         }
@@ -103,6 +99,10 @@ namespace Sistema_CursosOnline.Application.ServicesApp
 
         private string GenerateJwtToken (User user)
         {
+            if (user.Id == 0)  
+            {
+                throw new InvalidOperationException("User ID is invalid.");
+            }
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtsecret);
             if(!int.TryParse(_jwtExpirationMinutes, out var expirationMinutes))

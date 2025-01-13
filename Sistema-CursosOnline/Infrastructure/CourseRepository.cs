@@ -23,25 +23,22 @@ namespace Sistema_CursosOnline.Infrastructure
                 INNER JOIN Users u ON u.Id = c.InstructorId
                 WHERE c.Id = @Id";
 
+
             using (var connection = _dbConnection.GetConnection())
             {
-                var result = await connection.QueryFirstOrDefaultAsync<CourseWithInstructor>(query, new { Id = id });
+                var result = await connection.QueryFirstOrDefaultAsync<Course>(query, new { Id = id });
 
                 if (result == null) return null;
 
-                return new Course
+                var instructorQuery = "SELECT * FROM Users WHERE Id = @InstructorId";
+                var instructor = await connection.QueryFirstOrDefaultAsync<User>(instructorQuery, new { InstructorId = result.InstructorId });
+
+                if (instructor != null)
                 {
-                    Id = result.Id,
-                    Title = result.Title,
-                    Description = result.Description,
-                    CoverImage = result.CoverImage,
-                    CreatedAt = result.CreatedAt,
-                    Instructor = new User
-                    {
-                        Id = result.InstructorId,
-                        Name = result.InstructorName
-                    }
-                };
+                    result.Instructor = instructor;
+                }
+
+                return result;
             }
         }
 
@@ -96,12 +93,19 @@ namespace Sistema_CursosOnline.Infrastructure
         public async Task UpdateAsync(Course course)
         {
             var query = @"
-                UPDATE Courses 
-                SET Title = @Title, Description = @Description, CoverImage = @CoverImage, InstructorId = @InstructorId
-                WHERE Id = @Id";
+                INSERT INTO Courses (Title, Description, CoverImage, InstructorId, CreatedAt)
+                VALUES (@Title, @Description, @CoverImage, @InstructorId, @CreatedAt)";
+
             using (var connection = _dbConnection.GetConnection())
             {
-                await connection.ExecuteAsync(query, course);
+                await connection.ExecuteAsync(query, new
+                {
+                    course.Title,
+                    course.Description,
+                    course.CoverImage,
+                    course.InstructorId,   
+                    course.CreatedAt
+                });
             }
         }
 

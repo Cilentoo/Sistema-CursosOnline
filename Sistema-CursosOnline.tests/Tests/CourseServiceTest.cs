@@ -32,7 +32,8 @@ namespace Sistema_CursosOnline.tests.Tests
             {
                 Title = "New Course",
                 Description = "Course Description",
-                InstructorId = 1
+                InstructorId = 1,
+                CoverImage = Convert.ToBase64String(Encoding.UTF8.GetBytes("sample-image-data"))
             };
             _mockUserRepository.Setup(repo => repo.GetByIdAsync(courseDto.InstructorId))
                 .ReturnsAsync(new User { Id = 1, Name = "Instructor Name", Role = EType.Instructor });

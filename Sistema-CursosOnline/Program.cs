@@ -32,6 +32,17 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")  
+              .AllowAnyMethod()                   
+              .AllowAnyHeader()                    
+              .AllowCredentials();                 
+    });
+});
+
 builder.Services.AddScoped<IUserService>(provider =>
 {
     var configuration = provider.GetRequiredService<IConfiguration>();
@@ -65,6 +76,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowSpecificOrigin");
 
 app.UseAuthentication();
 

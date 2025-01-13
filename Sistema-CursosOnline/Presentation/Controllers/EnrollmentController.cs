@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Sistema_CursosOnline.Application.DTO;
 using Sistema_CursosOnline.Domain.IServices;
 
@@ -6,6 +7,7 @@ namespace Sistema_CursosOnline.Presentation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowFrontend")]
     public class EnrollmentController : ControllerBase
     {
         private readonly IEnrollmentService _enrollmentService;

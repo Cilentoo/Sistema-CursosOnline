@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Sistema_CursosOnline.Application.DTO;
 using Sistema_CursosOnline.Application.Request;
 using Sistema_CursosOnline.Domain.IServices;
@@ -24,6 +25,11 @@ public class UserController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> login([FromBody] LoginRequest request)
     {
+        if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
+        {
+            return BadRequest(new { Message = "Email e senha são obrigatórios." });
+        }
+
         try
         {
             var token = await _userService.AuthenticateAsync(request.Email, request.Password);
@@ -31,7 +37,11 @@ public class UserController : ControllerBase
         }
         catch (UnauthorizedAccessException ex)
         {
-            return Unauthorized(new { Message = ex.Message });
+            return Unauthorized(new { Message = "Email ou senha inválidos", Details = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { Message = "Erro ao realizar login", Details = ex.Message });
         }
     }
 
@@ -49,7 +59,7 @@ public class UserController : ControllerBase
 
             var user = await _userService.RegisterAsync(userDto, request.Password);
 
-            return Ok(user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
         catch (Exception ex)
         {
@@ -60,14 +70,25 @@ public class UserController : ControllerBase
     [HttpPut("update/{id}")]
     public async Task<IActionResult> UpdateUser(int id, [FromBody] UserDTO userDto)
     {
+        if (userDto == null)
+        {
+            return BadRequest(new { Message = "Dados do usuário não fornecidos" });
+        }
+
         try
         {
+            var existingUser = await _userService.GetUserByIdAsync(id);
+            if (existingUser == null)
+            {
+                return NotFound(new { Message = "Usuário não encontrado." });
+            }
+
             await _userService.UpdateUserAsync(id, userDto);
-            return Ok(new { Message = "Usuário atualizado com sucesso" });
+            return Ok(new { Message = "Usuário atualizado com sucesso." });
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            return BadRequest(new { Message = ex.Message });
+            return BadRequest(new { Message = "Erro ao atualizar usuário", Details = ex.Message });
         }
     }
 
