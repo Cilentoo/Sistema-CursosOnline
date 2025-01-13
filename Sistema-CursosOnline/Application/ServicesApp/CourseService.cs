@@ -10,11 +10,12 @@ namespace Sistema_CursosOnline.Application.ServicesApp
     public class CourseService : ICourseService
     {
         private readonly ICourseRepository _courseRepository;
-        private const string ImgurClientId = "1f23293e27378e5";
+        private readonly IUserRepository _userRepository;
 
-        public CourseService(ICourseRepository courseRepository)
+        public CourseService(ICourseRepository courseRepository, IUserRepository userRepository)
         {
             _courseRepository = courseRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<IEnumerable<CourseDTO>> GetAllAsync()
@@ -26,7 +27,17 @@ namespace Sistema_CursosOnline.Application.ServicesApp
         public async Task<CourseDTO> GetByIdAsync(int id)
         {
             var course = await _courseRepository.GetByIdAsync(id);
-            return MapToDto(course);
+
+            var instructor = await _userRepository.GetByIdAsync(course.InstructorId);
+            return new CourseDTO
+            {
+                Id = course.Id,
+                Title = course.Title,
+                Description = course.Description,
+                CreationDate = course.CreationDate,
+                Status = course.Status,
+                PhotoData = course.PhotoData
+            };
         }
 
         public async Task<IEnumerable<CourseDTO>> GetByStatusAsync(string status)
@@ -35,24 +46,35 @@ namespace Sistema_CursosOnline.Application.ServicesApp
             return MapToDtoList(courses);
         }
 
-        public async Task AddAsync(CourseDTO courseDTO)
+        public async Task AddAsync(CourseDTO courseDTO, int instructorId)
         {
-            var photoUrl = await UploadImageToImgur(courseDTO.PhotoURL);
-            courseDTO.PhotoURL = photoUrl;
-            var course = MapToEntity(courseDTO);
+            var course = new Course
+            {
+                Title = courseDTO.Title,
+                Description = courseDTO.Description,
+                InstructorId = instructorId,
+                CreationDate = DateTime.UtcNow,
+                Status = courseDTO.Status,
+                PhotoData = courseDTO.PhotoData
+            };
+
             await _courseRepository.AddAsync(course);
         }
 
         public async Task UpdateAsync(CourseDTO courseDTO)
         {
-            if (!string.IsNullOrEmpty(courseDTO.PhotoURL))
+            var existingCourse = await _courseRepository.GetByIdAsync(courseDTO.Id);
+            if (existingCourse == null)
             {
-                var photoUrl = await UploadImageToImgur(courseDTO.PhotoURL);
-                courseDTO.PhotoURL = photoUrl;
+                throw new InvalidOperationException("Curso não encontrado.");
             }
 
-            var course = MapToEntity(courseDTO);
-            await _courseRepository.UpdateAsync(course);
+            existingCourse.Title = courseDTO.Title;
+            existingCourse.Description = courseDTO.Description;
+            existingCourse.Status = courseDTO.Status;
+            existingCourse.PhotoData = courseDTO.PhotoData;
+
+            await _courseRepository.UpdateAsync(existingCourse);
         }
 
         public async Task InactiveCourseAsync(int id)
@@ -60,20 +82,6 @@ namespace Sistema_CursosOnline.Application.ServicesApp
             await _courseRepository.InactiveCourseAsync(id);
         }
 
-        private async Task<string> UploadImageToImgur(string base64Image)
-        {
-            var client = new RestClient("https://api.imgur.com/3/image");
-            var request = new RestRequest("POST");
-            request.AddHeader("Authorization", $"Client-ID {ImgurClientId}");
-            request.AddParameter("image", base64Image);
-
-            var response = await client.ExecuteAsync<ImgurResponse>(request);
-            if (response.IsSuccessful && response.Data != null && response.Data.Data != null)
-            {
-                return response.Data.Data.Link; 
-            }
-            throw new Exception("Erro ao fazer upload da imagem no Imgur: " + response.ErrorMessage);
-        }
 
         private static CourseDTO MapToDto(Course course)
         {
@@ -82,10 +90,9 @@ namespace Sistema_CursosOnline.Application.ServicesApp
                 Id = course.Id,
                 Title = course.Title,
                 Description = course.Description,
-                InstructorName = course.InstructorId?.Name,
                 CreationDate = course.CreationDate,
                 Status = course.Status,
-                PhotoURL = course.PhotoURL,
+                PhotoData = course.PhotoData,
             };
         }
 
@@ -96,24 +103,23 @@ namespace Sistema_CursosOnline.Application.ServicesApp
                 Id = course.Id,
                 Title = course.Title,
                 Description = course.Description,
-                InstructorName = course.InstructorId?.Name,
                 CreationDate = course.CreationDate,
                 Status = course.Status,
-                PhotoURL = course.PhotoURL
+                PhotoData = course.PhotoData
             });
         }
 
-        private static Course MapToEntity(CourseDTO courseDTO)
+        private static Course MapToEntity(CourseDTO courseDTO, int instructorId)
         {
             return new Course
             {
                 Id = courseDTO.Id,
                 Title = courseDTO.Title,
                 Description = courseDTO.Description,
-                InstructorId = new User { Name = courseDTO.InstructorName },
+                InstructorId = instructorId,
                 CreationDate = courseDTO.CreationDate,
                 Status = courseDTO.Status,
-                PhotoURL = courseDTO.PhotoURL
+                PhotoData = courseDTO.PhotoData
             };
         }
     }

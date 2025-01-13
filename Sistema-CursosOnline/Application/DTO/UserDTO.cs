@@ -1,4 +1,6 @@
-﻿namespace Sistema_CursosOnline.Application.DTO
+﻿using Sistema_CursosOnline.Domain.Entities;
+
+namespace Sistema_CursosOnline.Application.DTO
 {
     public class UserDTO
     {

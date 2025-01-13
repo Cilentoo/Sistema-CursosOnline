@@ -6,5 +6,9 @@ namespace Sistema_CursosOnline.Domain.IServices
     {
         Task<string> AuthenticateAsync(string email, string password);
         Task<UserDTO> GetUserByIdAsync(int id);
+        Task<UserDTO> RegisterAsync(UserDTO userDTO, string password);
+        Task UpdateUserAsync(int id, UserDTO userDTO);
+
+        Task InactivateUserAsync(int id);
     }
 }

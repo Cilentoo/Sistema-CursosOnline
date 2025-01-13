@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Text;
 using Dapper;
 using Sistema_CursosOnline.Data;
@@ -19,7 +20,7 @@ namespace Sistema_CursosOnline.Infrastructure
 
         public async Task<IEnumerable<User>> GetUserAsync()
         {
-            var query = "SELECT * FROM Users";
+            var query = "SELECT * FROM users";
             using (var connection = _dbConnection.GetConnection()) 
             {
                 return await connection.QueryAsync<User>(query);
@@ -28,7 +29,7 @@ namespace Sistema_CursosOnline.Infrastructure
 
         public async Task<User> GetByIdAsync(int id)
         {
-            var query = "SELECT * FROM Users Where Id = @Id";
+            var query = "SELECT * FROM users Where Id = @Id";
             using (var connection = _dbConnection.GetConnection())
             {
                 return await connection.QuerySingleOrDefaultAsync<User>(query, new {Id = id}) ?? throw new InvalidOperationException("Usuário não encontrado");
@@ -37,16 +38,18 @@ namespace Sistema_CursosOnline.Infrastructure
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            var query = "SELECT * FROM Users WHERE Email = @Email";
+            var query = "SELECT Name, Email, Password_Hash AS PasswordHash, Role, Status FROM users WHERE Email = @Email";
             using (var connection = _dbConnection.GetConnection())
             {
-                return await connection.QueryFirstOrDefaultAsync<User>(query, new { Email = email });
+                var user = await connection.QueryFirstOrDefaultAsync<User>(query, new { Email = email });
+                return user;
             }
         }
 
-        public async Task AddAsync(User user)
+        public async Task AddAsync(User user, string password)
         {
-            var query = "INSERT INTO Users (Name, Email, PasswordHash, Role, Status) VALUES (@Name, @Email, @PasswordHash, @Role, @Status)";
+            user.SetPassword(password);
+            var query = "INSERT INTO users (Name, Email, Password_Hash, Role, Status) VALUES (@Name, @Email, @PasswordHash, @Role, 'Ativo')";
             using (var connection = _dbConnection.GetConnection())
             {
                 await connection.ExecuteAsync(query, user);
@@ -55,7 +58,7 @@ namespace Sistema_CursosOnline.Infrastructure
 
         public async Task UpdateAsync (User user)
         {
-            var query = "UPDATE Users SET Name = @Name, Email = @Email, PasswordHash = @PasswordHash, Role = @Role, Status = @Status WHERE Id = @Id";
+            var query = "UPDATE users SET Name = @Name, Email = @Email, PasswordHash = @PasswordHash, PasswordKey = @PasswordKey, Role = @Role, Status = @Status WHERE Id = @Id";
             using (var connection = _dbConnection.GetConnection())
             {
                 await connection.ExecuteAsync(query, user);
@@ -64,7 +67,7 @@ namespace Sistema_CursosOnline.Infrastructure
 
         public async Task InactiveAsync(int id)
         {
-            var query = "UPDATE Users SET Status = 'Inativo' WHERE id = @Id";
+            var query = "UPDATE users SET Status = 'Inativo' WHERE id = @Id";
             using (var connection = _dbConnection.GetConnection())
             {
                 await connection.ExecuteAsync(query, new { Id = id, });
@@ -73,38 +76,18 @@ namespace Sistema_CursosOnline.Infrastructure
 
         public async Task<User> AuthenticateAsync(string email, string password)
         {
+
             var user = await GetByEmailAsync(email);
-            if(user == null)
+            if (user == null || !user.ValidatePassword(password))
             {
                 return null;
             }
 
-            if(!VerifyPasswordHash (password, user.PasswordHash))
+            if (!user.ValidatePassword(password))
             {
-                return null;
+                return null; 
             }
             return user;
-        }
-
-        public static string CreatePasswordHash(string password)
-        {
-            using (var hmac = new HMACSHA512()){
-                var passwordBytes = Encoding.UTF8.GetBytes(password);
-                var hash = hmac.ComputeHash(passwordBytes);
-                return Convert.ToBase64String(hash);
-            }
-        }
-
-        public static bool VerifyPasswordHash(string password, string storedHash)
-        {
-            var hashBytes = Convert.FromBase64String(storedHash);
-            using(var hmac = new HMACSHA512())
-            {
-                var passwordBytes = Encoding.UTF8.GetBytes (password);
-                var computedHash = hmac.ComputeHash(passwordBytes);
-
-                return computedHash.SequenceEqual(hashBytes);
-            }
         }
     }
 }

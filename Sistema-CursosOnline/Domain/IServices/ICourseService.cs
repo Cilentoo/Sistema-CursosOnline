@@ -7,7 +7,7 @@ namespace Sistema_CursosOnline.Domain.IServices
         Task<IEnumerable<CourseDTO>> GetAllAsync();
         Task<CourseDTO> GetByIdAsync(int id);
         Task<IEnumerable<CourseDTO>> GetByStatusAsync(string status);
-        Task AddAsync(CourseDTO courseDto);
+        Task AddAsync(CourseDTO courseDto, int instructorId);
         Task UpdateAsync(CourseDTO courseDto);
         Task InactiveCourseAsync(int id);
     }

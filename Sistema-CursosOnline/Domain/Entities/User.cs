@@ -25,11 +25,21 @@
             Role = role;
             Status = status;
         }
+
+        public void SetPassword(string password)
+        {
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(password);
+        }
+
+        public bool ValidatePassword(string password)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, PasswordHash);
+        }
     }
 
     public enum EType 
     { 
-        Instructor,
-        Student 
+        Instructor = 0,
+        Student = 1
     }
 }

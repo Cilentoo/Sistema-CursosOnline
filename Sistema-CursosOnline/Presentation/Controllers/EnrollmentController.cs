@@ -9,7 +9,6 @@ namespace Sistema_CursosOnline.Presentation.Controllers
     [ApiController]
     public class EnrollmentController : ControllerBase
     {
-
         private readonly EnrollmentService _enrollmentService;
 
         public EnrollmentController(EnrollmentService enrollmentService)
@@ -18,32 +17,42 @@ namespace Sistema_CursosOnline.Presentation.Controllers
         }
 
         [HttpGet("{courseId}")]
-       // [Authorize(Roles = "Student")]
         public async Task<IActionResult> GetEnrollmentStatus(int courseId)
         {
-            var studentId = GetStudentId(); 
-            var isEnrolled = await _enrollmentService.IsEnrolledAsync(courseId, studentId);
+            var studentId = GetStudentId();  
+            var isEnrolled = await _enrollmentService.IsEnrolledAsync(new EnrollmentDTO
+            {
+                StudentId = studentId,
+                CourseId = courseId
+            });
             return Ok(new { IsEnrolled = isEnrolled });
         }
 
+        
         [HttpPost]
-       // [Authorize(Roles = "Student")]
         public async Task<IActionResult> EnrollInCourse([FromBody] EnrollmentDTO enrollmentDTO)
         {
-            var studentId = GetStudentId(); 
-            await _enrollmentService.EnrollAsync(enrollmentDTO.CourseId, studentId);
+            var studentId = GetStudentId();  
+            enrollmentDTO.StudentId = studentId;  
+            await _enrollmentService.EnrollAsync(enrollmentDTO);
             return Ok("Inscrição realizada com sucesso.");
         }
 
 
         [HttpDelete("{courseId}")]
-       // [Authorize(Roles = "Student")]
         public async Task<IActionResult> UnenrollFromCourse(int courseId)
         {
-            var studentId = GetStudentId();
-            await _enrollmentService.UnenrollAsync(courseId, studentId);
+            var studentId = GetStudentId();  
+            var enrollmentDto = new EnrollmentDTO
+            {
+                StudentId = studentId,
+                CourseId = courseId
+            };
+            await _enrollmentService.UnenrollAsync(enrollmentDto);
             return Ok("Desinscrição realizada com sucesso.");
         }
+
+    
         private int GetStudentId()
         {
             return int.Parse(User.FindFirst("StudentId")?.Value);

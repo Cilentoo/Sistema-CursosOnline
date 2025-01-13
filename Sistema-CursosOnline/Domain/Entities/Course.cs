@@ -6,12 +6,12 @@ namespace Sistema_CursosOnline.Domain.Entities
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public User InstructorId { get; set; }
+        public int InstructorId { get; set; }
         public DateTime CreationDate { get; set; }
         public string Status { get; set; }
-        public string PhotoURL { get; set; }
+        public byte[] PhotoData { get; set; }
 
-        public Course (int id, string title, string description, User instructorId, DateTime creationDate, string status, string photoURL)
+        public Course (int id, string title, string description, int instructorId, DateTime creationDate, string status, byte[] photoData)
         {
             Id = id;
             Title = title;
@@ -19,7 +19,7 @@ namespace Sistema_CursosOnline.Domain.Entities
             InstructorId = instructorId;
             CreationDate = creationDate;
             Status = status;
-            PhotoURL = photoURL;
+            PhotoData = photoData;
         }
 
         public Course() {}
