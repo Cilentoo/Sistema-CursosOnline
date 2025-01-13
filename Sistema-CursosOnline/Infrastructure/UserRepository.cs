@@ -89,5 +89,14 @@ namespace Sistema_CursosOnline.Infrastructure
             }
             return user;
         }
+
+        public async Task<string> GetNameByIdAsync(int id)
+        {
+            var query = "SELECT Name FROM Users WHERE Id = @Id AND Role = @Role";
+            using (var connection = _dbConnection.GetConnection())
+            {
+                return await connection.QuerySingleOrDefaultAsync<string>(query, new { Id = id, Role = EType.Instructor });
+            }
+        }
     }
 }
