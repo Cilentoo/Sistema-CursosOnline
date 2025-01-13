@@ -17,5 +17,7 @@ namespace Sistema_CursosOnline.Domain.IRepository
         Task InactiveAsync(int id);
 
         Task<User> AuthenticateAsync(string email, string password);
+
+        Task<string> GetNameByIdAsync(int id); 
     }
 }
