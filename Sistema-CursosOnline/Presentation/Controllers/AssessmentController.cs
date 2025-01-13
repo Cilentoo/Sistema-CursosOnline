@@ -8,38 +8,32 @@ namespace Sistema_CursosOnline.Presentation.Controllers
     [ApiController]
     public class AssessmentController : ControllerBase
     {
-        private readonly IAssessmentService _AssessmentService;
+        private readonly IAssessmentService _assessmentService;
 
-        public AssessmentController(IAssessmentService AssessmentService)
+        public AssessmentController(IAssessmentService assessmentService)
         {
-            _AssessmentService = AssessmentService;
+            _assessmentService = assessmentService;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateAssessment([FromBody] AssessmentDTO AssessmentDto)
         {
-            await _AssessmentService.CreateAssessmentAsync(AssessmentDto);
+            await _assessmentService.CreateAssessmentAsync(AssessmentDto);
             return Ok();
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAssessment(int id, [FromBody] AssessmentDTO AssessmentDto)
-        {
-            await _AssessmentService.UpdateAssessmentAsync(id, AssessmentDto);
-            return Ok();
-        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAssessment(int id)
         {
-            await _AssessmentService.DeleteAssessmentAsync(id);
+            await _assessmentService.DeleteAssessmentAsync(id);
             return Ok();
         }
 
         [HttpGet("course/{courseId}")]
         public async Task<IActionResult> GetAssessmentsByCourseId(int courseId)
         {
-            var Assessments = await _AssessmentService.GetAssessmentsByCourseIdAsync(courseId);
+            var Assessments = await _assessmentService.GetAssessmentByCourseIdAsync(courseId);
             return Ok(Assessments);
         }
     }

@@ -45,6 +45,15 @@ namespace Sistema_CursosOnline.Infrastructure
             }
         }
 
+        public async Task<IEnumerable<Course>> GetByInstructorIdAsync(int instructorId)
+        {
+            var query = "SELECT * FROM Courses WHERE InstructorId = @InstructorId";
+            using (var connection = _dbConnection.GetConnection())
+            {
+                return await connection.QueryAsync<Course>(query, new { InstructorId = instructorId });
+            }
+        }
+
         public async Task<IEnumerable<Course>> GetAllAsync()
         {
             var query = @"

@@ -1,6 +1,7 @@
 ﻿using Sistema_CursosOnline.Application.DTO;
 using Sistema_CursosOnline.Domain.Entities;
 using Sistema_CursosOnline.Domain.IRepository;
+using Sistema_CursosOnline.Domain.IServices;
 
 namespace Sistema_CursosOnline.Application.ServicesApp
 {

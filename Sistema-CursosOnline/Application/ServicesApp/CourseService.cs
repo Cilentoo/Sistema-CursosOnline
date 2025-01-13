@@ -33,6 +33,22 @@ namespace Sistema_CursosOnline.Application.ServicesApp
             };
         }
 
+        public async Task<IEnumerable<CourseDTO>> GetCoursesByInstructorIdAsync(int instructorId)
+        {
+            var courses = await _courseRepository.GetByInstructorIdAsync(instructorId);
+
+            return courses.Select(course => new CourseDTO
+            {
+                Id = course.Id,
+                Title = course.Title,
+                Description = course.Description,
+                CoverImage = course.CoverImage,
+                CreatedAt = course.CreatedAt,
+                InstructorName = course.Instructor.Name,  
+                InstructorId = course.Instructor.Id
+            });
+        }
+
         public async Task<IEnumerable<CourseDTO>> GetAllCoursesAsync()
         {
             var courses = await _courseRepository.GetAllAsync();
