@@ -1,9 +1,11 @@
-﻿namespace Sistema_CursosOnline.Domain.IServices
+﻿using Sistema_CursosOnline.Application.DTO;
+
+namespace Sistema_CursosOnline.Domain.IServices
 {
     public interface IEnrollmentService
     {
-        Task EnrollAsync(int studentId, int courseId);
-        Task UnenrollAsync(int studentId, int courseId);
-        Task<bool> IsEnrolledAsync(int studentId, int courseId);
+        Task EnrollAsync(EnrollmentDTO enrollmentDTO);
+        Task UnenrollAsync(EnrollmentDTO enrollmentDTO);
+        Task<bool> IsEnrolledAsync(EnrollmentDTO enrollmentDTO);
     }
 }

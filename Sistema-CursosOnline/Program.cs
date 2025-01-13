@@ -2,8 +2,10 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Sistema_CursosOnline.Application.ServicesApp;
+using Sistema_CursosOnline.Data;
 using Sistema_CursosOnline.Domain.IRepository;
 using Sistema_CursosOnline.Domain.IServices;
+using Sistema_CursosOnline.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +42,15 @@ builder.Services.AddScoped<IUserService>(provider =>
     );
 });
 
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<PostgresConnection>(provider => 
+{
+    var configuration = provider.GetRequiredService<IConfiguration>(); 
+    return new PostgresConnection(configuration.GetConnectionString("PostgreSQLConnection"));
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -50,7 +61,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseAuthentication();
-app.UseAuthorization();
 
 app.UseHttpsRedirection();
 

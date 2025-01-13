@@ -10,7 +10,7 @@ namespace Sistema_CursosOnline.Domain.IRepository
 
         Task<User> GetByEmailAsync(string email);
 
-        Task AddAsync(User user);
+        Task AddAsync(User user, string password);
 
         Task UpdateAsync(User user);
 

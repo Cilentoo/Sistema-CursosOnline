@@ -44,17 +44,18 @@ namespace Sistema_CursosOnline.Infrastructure
         }
 
         public async Task AddAsync(Course course)
-        { 
-            var query = "INSERT INTO Courses (Title, Description, InstructorId, Status, CreationDate, PhotoURL) VALUES (@Title, @Description, @InstructorId, @CreationDate, @PhotoURL)";
+        {
+            var query = "INSERT INTO Courses (Title, Description, Instructor_Id, Status, Creation_Date, PhotoData) " +
+                        "VALUES (@Title, @Description, @InstructorId, @Status, @CreationDate, @PhotoData)";
             using (var connection = _dbConnection.GetConnection())
             {
-                await connection.ExecuteAsync(query, course);
+                await connection.ExecuteAsync(query);
             }
         }
 
         public async Task UpdateAsync(Course course)
         {
-            var query = "UPDATE Courses SET Title = @Title, Description = @Description, InstructorId = @InstructorId, Status = @Status, PhotoURL = @PhotoURL WHERE Id = @Id";
+            var query = "UPDATE Courses SET Title = @Title, Description = @Description, InstructorId = @InstructorId, Status = @Status, PhotoData = @PhotoData WHERE Id = @Id";
             using (var connection = _dbConnection.GetConnection())
             {
                 await connection.ExecuteAsync(query, course);
