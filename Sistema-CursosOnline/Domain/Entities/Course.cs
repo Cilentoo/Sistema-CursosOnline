@@ -11,7 +11,7 @@ namespace Sistema_CursosOnline.Domain.Entities
         public int InstructorId { get; set; }
         public User Instructor { get; set; }
         public List<Module> Modules { get; set; }
-        public List<Assessments> Assessments { get; set; }
+        public List<Assessment> Assessment { get; set; }
 
         public Course()
         {
@@ -27,7 +27,7 @@ namespace Sistema_CursosOnline.Domain.Entities
             InstructorId = instructorId;
             Instructor = instructor;
             Modules = new List<Module>();
-            Assessments = new List<Assessment>();
+            Assessment = new List<Assessment>();
         }
     }
 }
