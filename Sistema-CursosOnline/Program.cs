@@ -43,6 +43,8 @@ builder.Services.AddScoped<IUserService>(provider =>
 });
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<PostgresConnection>(provider => 
 {
     var configuration = provider.GetRequiredService<IConfiguration>(); 
