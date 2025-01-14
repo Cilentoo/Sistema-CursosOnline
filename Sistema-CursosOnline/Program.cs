@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.IdentityModel.Tokens;
 using Sistema_CursosOnline.Application.ServicesApp;
 using Sistema_CursosOnline.Data;
@@ -8,6 +9,12 @@ using Sistema_CursosOnline.Domain.IServices;
 using Sistema_CursosOnline.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.Limits.MaxRequestBodySize = long.MaxValue;
+});
+
 
 // Add services to the container.
 
