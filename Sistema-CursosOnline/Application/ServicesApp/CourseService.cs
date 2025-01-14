@@ -1,4 +1,5 @@
 ﻿using Sistema_CursosOnline.Application.DTO;
+using Sistema_CursosOnline.Application.Messaging;
 using Sistema_CursosOnline.Domain.Entities;
 using Sistema_CursosOnline.Domain.IRepository;
 using Sistema_CursosOnline.Domain.IServices;
@@ -8,12 +9,14 @@ namespace Sistema_CursosOnline.Application.ServicesApp
     public class CourseService : ICourseService
     {
         private readonly ICourseRepository _courseRepository;
-        private readonly IUserRepository _userRepository; 
+        private readonly IUserRepository _userRepository;
+        private readonly RabbitMqConfig _rabbitMqConfiguration;
 
         public CourseService(ICourseRepository courseRepository, IUserRepository userRepository)
         {
             _courseRepository = courseRepository;
             _userRepository = userRepository;
+            _rabbitMqConfiguration = new RabbitMqConfig();
         }
 
         public async Task<CourseDTO> GetCourseByIdAsync(int id)
@@ -95,6 +98,13 @@ namespace Sistema_CursosOnline.Application.ServicesApp
             };
 
             await _courseRepository.AddAsync(course);
+
+            using (var connection = _rabbitMqConfiguration.CreateConnection())
+            using (var channel = _rabbitMqConfiguration.CreateChannel(connection))
+            {
+                var message = $"Curso {courseDto.Title} foi criado";
+                _rabbitMqConfiguration.SendMessage(channel, message);
+            }
         }
 
         public async Task UpdateCourseAsync(CourseDTO courseDto)
@@ -135,7 +145,17 @@ namespace Sistema_CursosOnline.Application.ServicesApp
 
         public async Task DeleteCourseAsync(int id)
         {
+            var course = await _courseRepository.GetByIdAsync(id);
+            if (course == null) throw new Exception("Curso não encontrado");
+
             await _courseRepository.DeleteAsync(id);
+
+            using (var connection = _rabbitMqConfiguration.CreateConnection())
+            using (var channel = _rabbitMqConfiguration.CreateChannel(connection))
+            {
+                var message = $"Curso {course.Title} foi deletado";
+                _rabbitMqConfiguration.SendMessage(channel, message);
+            }
         }
     }
 }

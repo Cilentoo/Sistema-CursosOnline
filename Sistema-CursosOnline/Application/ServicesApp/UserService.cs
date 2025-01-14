@@ -7,6 +7,7 @@ using System.Text;
 using Sistema_CursosOnline.Domain.IRepository;
 using Sistema_CursosOnline.Domain.IServices;
 using System.CodeDom.Compiler;
+using Sistema_CursosOnline.Application.Messaging;
 
 namespace Sistema_CursosOnline.Application.ServicesApp
 {
@@ -15,12 +16,14 @@ namespace Sistema_CursosOnline.Application.ServicesApp
         private readonly IUserRepository _userRepository;
         private readonly string _jwtsecret;
         private readonly string _jwtExpirationMinutes;
+        private readonly RabbitMqConfig _rabbitMqConfiguration;
 
         public UserService(IUserRepository userRepository, string jwtsecret, string jwtExpirationMinutes)
         {
             _userRepository = userRepository;
             _jwtsecret = jwtsecret;
             _jwtExpirationMinutes = jwtExpirationMinutes;
+            _rabbitMqConfiguration = new RabbitMqConfig();
         }
 
         public async Task<string> AuthenticateAsync(string email, string password)
@@ -71,6 +74,13 @@ namespace Sistema_CursosOnline.Application.ServicesApp
 
             await _userRepository.AddAsync(user, password);
 
+            using (var connection = _rabbitMqConfiguration.CreateConnection())
+            using (var channel = _rabbitMqConfiguration.CreateChannel(connection))
+            {
+                var message = $"Novo usuário {user.Name} foi registrado";
+                _rabbitMqConfiguration.SendMessage(channel, message);
+            }
+
             return new UserDTO
             {
                 Id = user.Id,
@@ -79,6 +89,8 @@ namespace Sistema_CursosOnline.Application.ServicesApp
                 Role = user.Role.ToString(),
                 Status = user.Status
             };
+
+
         }
 
         public async Task UpdateUserAsync(int id, UserDTO userDTO)
