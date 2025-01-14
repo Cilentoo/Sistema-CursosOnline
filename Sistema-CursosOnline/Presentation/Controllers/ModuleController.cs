@@ -7,7 +7,7 @@ namespace Sistema_CursosOnline.Presentation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableCors("AllowFrontend")]
+ 
     public class ModuleController : ControllerBase
     {
         private readonly IModuleService _moduleService;
