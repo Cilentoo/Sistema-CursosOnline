@@ -7,7 +7,6 @@ namespace Sistema_CursosOnline.Presentation.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableCors("AllowFrontend")]
     public class AssessmentController : ControllerBase
     {
         private readonly IAssessmentService _assessmentService;
