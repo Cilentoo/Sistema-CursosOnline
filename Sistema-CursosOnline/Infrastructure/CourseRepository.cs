@@ -23,22 +23,28 @@ namespace Sistema_CursosOnline.Infrastructure
                 INNER JOIN Users u ON u.Id = c.InstructorId
                 WHERE c.Id = @Id";
 
-
             using (var connection = _dbConnection.GetConnection())
             {
-                var result = await connection.QueryFirstOrDefaultAsync<Course>(query, new { Id = id });
+                var result = await connection.QueryFirstOrDefaultAsync<CourseWithInstructor>(query, new { Id = id });
 
                 if (result == null) return null;
 
-                var instructorQuery = "SELECT * FROM Users WHERE Id = @InstructorId";
-                var instructor = await connection.QueryFirstOrDefaultAsync<User>(instructorQuery, new { InstructorId = result.InstructorId });
-
-                if (instructor != null)
+                var course = new Course
                 {
-                    result.Instructor = instructor;
-                }
+                    Id = result.Id,
+                    Title = result.Title,
+                    Description = result.Description,
+                    CoverImage = result.CoverImage,
+                    CreatedAt = result.CreatedAt,
+                    InstructorId = result.InstructorId,
+                    Instructor = new User
+                    {
+                        Id = result.InstructorId,
+                        Name = result.InstructorName
+                    }
+                };
 
-                return result;
+                return course;
             }
         }
 
@@ -93,8 +99,9 @@ namespace Sistema_CursosOnline.Infrastructure
         public async Task UpdateAsync(Course course)
         {
             var query = @"
-                INSERT INTO Courses (Title, Description, CoverImage, InstructorId, CreatedAt)
-                VALUES (@Title, @Description, @CoverImage, @InstructorId, @CreatedAt)";
+                UPDATE Courses
+                SET Title = @Title, Description = @Description, CoverImage = @CoverImage, InstructorId = @InstructorId, CreatedAt = @CreatedAt
+                WHERE Id = @Id";
 
             using (var connection = _dbConnection.GetConnection())
             {
@@ -104,7 +111,8 @@ namespace Sistema_CursosOnline.Infrastructure
                     course.Description,
                     course.CoverImage,
                     course.InstructorId,   
-                    course.CreatedAt
+                    course.CreatedAt,
+                    course.Id
                 });
             }
         }

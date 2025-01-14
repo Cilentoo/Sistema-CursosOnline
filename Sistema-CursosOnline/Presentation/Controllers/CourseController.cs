@@ -1,4 +1,7 @@
-﻿using System.Security.Claims;
+﻿using System.Diagnostics;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Sistema_CursosOnline.Application.DTO;
@@ -65,28 +68,39 @@ namespace Sistema_CursosOnline.Presentation.Controllers
             return CreatedAtAction(nameof(GetCourseById), new { id = courseDto.Id }, courseDto);
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<ActionResult> UpdateCourse(int id, [FromBody] CourseDTO courseDto)
         {
-            if (courseDto == null || courseDto.Id != id)
+            if (courseDto == null || id <= 0 || courseDto.Id != id)
             {
-                return BadRequest("Id de curso diferentes");
-            }
-
-            var existingCourse = await _courseService.GetCourseByIdAsync(id);
-            if(existingCourse == null)
-            {
-                return NotFound();
+                return BadRequest(new { error = "Dados inválidos para atualização." });
             }
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId) || existingCourse.InstructorId != int.Parse(userId))
+            var courseInstructorId = courseDto.InstructorId;
+
+            Debug.WriteLine($"UserId: {userId}, CourseInstructorId: {courseInstructorId}");
+
+            if (string.IsNullOrEmpty(userId))
             {
-                return Forbid("Usuário não autorizado para alterar este curso.");
+                return Unauthorized("Usuário não autenticado.");
             }
 
-            await _courseService.UpdateCourseAsync(courseDto);
-            return NoContent();
+
+            if (int.Parse(userId) != courseDto.InstructorId)
+            {
+                return Forbid(JwtBearerDefaults.AuthenticationScheme);
+            }
+
+            try
+            {
+                await _courseService.UpdateCourseAsync(courseDto);
+                return Ok(new { message = "Curso atualizado com sucesso." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
 
         [HttpDelete("{id}")]

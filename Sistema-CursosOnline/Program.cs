@@ -30,6 +30,17 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Secret"])),
     };
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddCors(options =>

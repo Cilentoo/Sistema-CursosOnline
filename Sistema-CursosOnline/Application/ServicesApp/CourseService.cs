@@ -99,29 +99,38 @@ namespace Sistema_CursosOnline.Application.ServicesApp
 
         public async Task UpdateCourseAsync(CourseDTO courseDto)
         {
-      
+            if (courseDto == null)
+                throw new ArgumentNullException(nameof(courseDto), "O objeto de curso não pode ser nulo.");
+
+            var existingCourse = await _courseRepository.GetByIdAsync(courseDto.Id);
+            if (existingCourse == null)
+                throw new Exception($"Curso com ID {courseDto.Id} não encontrado.");
+
             var instructor = await _userRepository.GetByIdAsync(courseDto.InstructorId);
-            if (instructor == null) throw new Exception("Instructor not found");
+            if (instructor == null || instructor.Role != EType.Instructor)
+                throw new Exception("Instrutor não encontrado ou o usuário não tem o papel de instrutor.");
 
             byte[] coverImageBytes = null;
 
-            if (!string.IsNullOrEmpty(courseDto.CoverImage)) 
+            if (!string.IsNullOrEmpty(courseDto.CoverImage))
             {
-                coverImageBytes = Convert.FromBase64String(courseDto.CoverImage);  
+                if (courseDto.CoverImage.Contains(","))
+                {
+                    coverImageBytes = Convert.FromBase64String(courseDto.CoverImage.Split(',')[1]);
+                }
+                else
+                {
+                    coverImageBytes = Convert.FromBase64String(courseDto.CoverImage);
+                }
             }
 
+            existingCourse.Title = courseDto.Title;
+            existingCourse.Description = courseDto.Description;
+            existingCourse.CoverImage = coverImageBytes ?? existingCourse.CoverImage;
+            existingCourse.InstructorId = courseDto.InstructorId;
+            existingCourse.Instructor = instructor;
 
-            var course = new Course
-            {
-                Id = courseDto.Id,
-                Title = courseDto.Title,
-                Description = courseDto.Description,
-                CoverImage = coverImageBytes,
-                CreatedAt = courseDto.CreatedAt,
-                Instructor = instructor
-            };
-
-            await _courseRepository.UpdateAsync(course);
+            await _courseRepository.UpdateAsync(existingCourse);
         }
 
         public async Task DeleteCourseAsync(int id)
