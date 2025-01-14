@@ -1,5 +1,5 @@
 ﻿using RabbitMQ.Client;
-using System;
+
 
 namespace Sistema_CursosOnline.Application.Messaging
 {
@@ -19,13 +19,17 @@ namespace Sistema_CursosOnline.Application.Messaging
    
         public IModel CreateChannel(IConnection connection)
         {
-            IModel channel = connection.CreateModel(); 
-            
+            IModel channel = connection.CreateModel();
+            channel.ExchangeDeclare(exchange: _exchangeName, type: ExchangeType.Fanout);
+
             channel.QueueDeclare(queue: _queueName,
                                  durable: false,    
                                  exclusive: false,  
                                  autoDelete: false, 
-                                 arguments: null);  
+                                 arguments: null);
+            channel.QueueBind(queue: _queueName,
+                              exchange: _exchangeName,
+                              routingKey: string.Empty);
             return channel;
         }
 
