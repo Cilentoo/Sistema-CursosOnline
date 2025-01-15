@@ -118,10 +118,10 @@ Bônus (Extra):
 - RabbitMq
 - JWT Identity model (Dependency Nuget)
 - Brcypt.Net
-- Dapper
-- Moq
-- Npgsql
-- RestSharp
+- Dapper (Dependency Nuget)
+- Moq (Dependency Nuget)
+- Npgsql (Dependency Nuget)
+- RestSharp (Dependency Nuget)
 - **Ferramentas:**
 - Git
 - GitHub
